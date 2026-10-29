@@ -4,7 +4,7 @@
 <style>
 /* Brand tokens — matched to Êm Wellness pilot site */
 :root{--ink:#213e35;--primary:#264c3d;--primary-hover:#40634d;--sage:#dce6ce;--paper:#f8f6ef;--line:#dce2d8;--accent:#8ca560;--soft:#edf1e5;--warn:#8a4233;--radius:16px;--font:Arial,sans-serif}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}
+*{box-sizing:border-box}button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}
 .notice{background:var(--primary);color:#fff;text-align:center;font-size:12px;letter-spacing:1px;padding:7px 12px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);margin-bottom:18px}
 .logo{height:64px;width:auto;display:block}.hero{display:block;height:150px;width:auto;margin:4px auto 14px}
@@ -54,23 +54,24 @@ const QS=[["sleep",0,"Tôi ngủ đủ giấc và thức dậy thấy khỏe.","
 ["movement",1,"Tôi ngồi một chỗ nhiều giờ liền.","I sit for many hours without a break."],
 ["mood",0,"Tôi cảm thấy bình yên và hài lòng.","I feel calm and content."],
 ["mood",1,"Tôi dễ cáu gắt hoặc buồn bã.","I feel irritable or low."]];
-let lang=localStorage.getItem(CONFIG.storageKey+"-lang")||CONFIG.defaultLang,i=-1,ans=[];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let lang=store.get(CONFIG.storageKey+"-lang")||CONFIG.defaultLang,i=-1,ans=[],busy=false;
 const $=id=>document.getElementById(id),app=$("app");
-function load(){try{return JSON.parse(localStorage.getItem(CONFIG.storageKey))}catch(e){return null}}
-function setLang(l){lang=l;localStorage.setItem(CONFIG.storageKey+"-lang",l);document.documentElement.lang=l;render()}
+function load(){try{const d=JSON.parse(store.get(CONFIG.storageKey));return d&&Array.isArray(d.ans)&&d.ans.length===QS.length&&d.ans.every(v=>v>=0&&v<=4)?d:null}catch(e){return null}}
+function setLang(l){lang=l;store.set(CONFIG.storageKey+"-lang",l);document.documentElement.lang=l;render()}
 $("vi").onclick=()=>setLang("vi");$("en").onclick=()=>setLang("en");
 function compute(a){const s={};QS.forEach((q,k)=>{const v=q[1]?4-a[k]:a[k];(s[q[0]]=s[q[0]]||[]).push(v)});const c={};for(const k in s)c[k]=Math.round(s[k].reduce((x,y)=>x+y,0)/(s[k].length*4)*100);const o=Math.round(Object.values(c).reduce((x,y)=>x+y,0)/Object.keys(c).length);return{c,o}}
 function render(){const t=T[lang];$("notice").textContent=t.notice;$("vi").className=lang=="vi"?"on":"";$("en").className=lang=="en"?"on":"";
 if(i<0){const last=load();app.innerHTML=`<div class="card"><img class="hero" src="logo.png" alt=""><h1>${t.title}</h1><p class="muted">${t.intro}</p><div class="nav"><button class="primary" id="go">${t.start}</button><a class="btn" href="${CONFIG.bookingUrl}" target="_blank" rel="noopener">${t.book} ↗</a>${last?`<button id="last">${t.resume}</button>`:""}</div><div class="disc">${t.disc}</div></div>`;
 $("go").onclick=()=>{i=0;ans=[];render()};if(last)$("last").onclick=()=>{ans=last.ans;i=QS.length;render()};return}
 if(i<QS.length){const q=QS[i];app.innerHTML=`<div class="muted">${t.q} ${i+1}${t.of}${QS.length}</div><div class="bar" role="progressbar" aria-valuenow="${i}" aria-valuemax="${QS.length}"><i style="width:${i/QS.length*100}%"></i></div><div class="card"><div class="cat">${CATS[q[0]][lang]}</div><h2>${lang=="vi"?q[2]:q[3]}</h2><div class="opts">${t.opts.map((o,k)=>`<button data-k="${k}" class="${ans[i]===k?"sel":""}">${o}</button>`).join("")}</div><div class="nav"><button id="bk" ${i==0?"disabled":""}>${t.back}</button><button class="primary" id="nx" ${ans[i]==null?"disabled":""}>${i==QS.length-1?t.finish:t.next}</button></div></div>`;
-app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{ans[i]=+b.dataset.k;setTimeout(()=>{i++;if(i==QS.length)save();render()},180);render()});
-$("bk").onclick=()=>{i--;render()};$("nx").onclick=()=>{i++;if(i==QS.length)save();render()};return}
+app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;ans[i]=+b.dataset.k;render();setTimeout(()=>{busy=false;if(i<QS.length&&ans[i]!=null){i++;if(i==QS.length)save()}render()},180)});
+$("bk").onclick=()=>{if(busy||i==0)return;i--;render()};$("nx").onclick=()=>{if(busy||ans[i]==null)return;i++;if(i==QS.length)save();render()};return}
 const r=compute(ans),saved=load(),band=t.band.find(b=>r.o>=b[0])[1],low=Object.entries(r.c).sort((a,b)=>a[1]-b[1]).slice(0,3);
 app.innerHTML=`<div class="stack"><div class="card"><div class="cat">${t.res}</div><div class="score">${r.o}<span style="font-size:20px">/100</span></div><p class="muted">${t.overall}</p><p><b>${band}</b></p></div>
 <div class="card">${Object.entries(r.c).map(([k,v])=>`<div class="row"><div class="nav"><span>${CATS[k][lang]}</span><b>${v}</b></div><div class="bar"><i style="width:${v}%"></i></div></div>`).join("")}</div>
 <div class="card book"><h2>${t.bookLead}</h2><a class="btn primary big" id="bookbtn" href="${CONFIG.bookingUrl}" target="_blank" rel="noopener">${t.book} ↗</a><p class="muted" style="margin:10px 0 0">${t.bookNote}</p></div><div class="card"><h2>${t.tips}</h2><ul>${low.map(([k])=>`<li><b>${CATS[k][lang]}:</b> ${CATS[k].tip[lang]}</li>`).join("")}</ul>${saved?`<p class="muted">${t.saved} ${new Date(saved.at).toLocaleString(lang=="vi"?"vi-VN":"en-US")}</p>`:""}<button class="primary" id="rs">${t.restart}</button></div><div class="disc">${t.disc}</div></div>`;
-$("rs").onclick=()=>{i=0;ans=[];render()}}
-function save(){const r=compute(ans);localStorage.setItem(CONFIG.storageKey,JSON.stringify({ans,score:r.o,cats:r.c,at:Date.now()}))}
+$("rs").onclick=()=>{i=0;ans=[];busy=false;render();scrollTo(0,0)}}
+function save(){const r=compute(ans);store.set(CONFIG.storageKey,JSON.stringify({ans,score:r.o,cats:r.c,at:Date.now()}))}
 document.documentElement.lang=lang;render();
-</script><script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></body></html>
+</script><script>if("serviceWorker" in navigator){let r=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!r){r=true;location.reload()}});addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(g=>g.update()).catch(()=>{}))}</script></body></html>
