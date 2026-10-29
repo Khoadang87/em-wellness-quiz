@@ -37,6 +37,7 @@ button{-webkit-user-select:none;user-select:none;-webkit-appearance:none;appeara
 .opts button{position:relative;padding-right:44px}.opts .sel{background:var(--primary)!important;color:#fff;border:2px solid var(--primary);font-weight:700}.opts .sel::after{content:"✓";position:absolute;right:16px;top:50%;transform:translateY(-50%);font-weight:700}
 header{padding-top:calc(16px + max(14px,env(safe-area-inset-top)))!important}
 .privacy{background:var(--sage);border-radius:12px;padding:10px 12px;font-size:14px}.flags{border:2px solid #b7791f;background:#fff8e6;border-radius:14px;padding:12px 14px;margin-top:12px}.flags ul{margin:6px 0 0;padding-left:18px}.rev dd{margin:2px 0 10px;font-weight:600}
+.rev.sum{display:block}.rev.sum dt{color:var(--muted,#666);font-size:14px}.rev.sum dd{margin:2px 0 12px}
 </style></head><body>
 <div id="errbar" role="alert"></div><script>
 (function(){function show(m){var b=document.getElementById("errbar");if(!b)return;b.style.display="block";b.textContent="Lỗi / Error: "+m+" (v8)"}
@@ -83,7 +84,7 @@ bs.forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(m){const now=Date.now();if(
 $("bk").onclick=()=>{if(busy||i==0)return;busy=true;setTimeout(()=>busy=false,400);i--;render()};$("nx").onclick=()=>{if(busy)return;if(ans[i]==null||(m&&!ans[i].length)){$("qmiss").hidden=false;return}busy=true;setTimeout(()=>busy=false,400);i++;if(i==QS.length)save();render()};return}
 const saved=load(),pain=ans[PAIN].filter(x=>x!==NOPAIN),fl=flagList(ans,lang),notes=[];
 notes.push(pain.length?`${t.focus} <b>${pain.map(x=>opt(PAIN,x)).join(", ")}</b>`:t.nofocus);if(ans[0]>=3||ans[1]>=2)notes.push(t.sleepTip);
-app.innerHTML=`<div class="stack"><div class="card"><div class="cat">${t.res}</div><h2>${t.answers}</h2><dl class="rev">${QS.map((q,k)=>`<dt>${k+1}. ${lang=="vi"?q[1]:q[2]}</dt><dd>${ansText(k,ans[k])}</dd>`).join("")}</dl></div>
+app.innerHTML=`<div class="stack"><div class="card"><div class="cat">${t.res}</div><h2>${t.answers}</h2><dl class="rev sum">${QS.map((q,k)=>`<dt>${k+1}. ${lang=="vi"?q[1]:q[2]}</dt><dd>${ansText(k,ans[k])}</dd>`).join("")}</dl></div>
 ${fl.length?`<div class="card flags" role="note"><h2>⚠︎ ${t.flagT}</h2><ul>${fl.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
 <div class="card"><h2>${t.notes}</h2><ul>${notes.map(x=>`<li>${x}</li>`).join("")}${fl.length?"":`<li>${t.allClear}</li>`}</ul></div>
 <div class="card book"><h2>${t.bookLead}</h2><button class="primary big" id="bookbtn">${t.book}</button><p class="muted" style="margin:10px 0 0">${t.bookNote} <a href="${CONFIG.bookingUrl}" target="_blank" rel="noopener">${BT[lang].pilot}</a></p></div><div class="card">${saved?`<p class="muted">${t.saved} ${new Date(saved.at).toLocaleString(lang=="vi"?"vi-VN":"en-US")}</p>`:""}<button class="primary" id="rs">${t.restart}</button></div><div class="disc">${t.disc}</div></div>`;
