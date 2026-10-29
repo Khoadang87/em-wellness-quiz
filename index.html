@@ -1,13 +1,13 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Êm Wellness — Self-check</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#264c3d"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Êm Wellness"><meta name="description" content="Êm Wellness self-check quiz">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#264c3d"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" type="image/png" href="favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Êm Wellness"><meta name="description" content="Êm Wellness self-check quiz">
 <style>
 /* Brand tokens — matched to Êm Wellness pilot site */
 :root{--ink:#213e35;--primary:#264c3d;--primary-hover:#40634d;--sage:#dce6ce;--paper:#f8f6ef;--line:#dce2d8;--accent:#8ca560;--soft:#edf1e5;--warn:#8a4233;--radius:16px;--font:Arial,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}
 .notice{background:var(--primary);color:#fff;text-align:center;font-size:12px;letter-spacing:1px;padding:7px 12px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);margin-bottom:18px}
-.logo{line-height:1;color:var(--ink)}.logo span{font:36px Georgia,"Times New Roman",serif;display:block}.logo small{letter-spacing:3px;font-size:8px}
+.logo{height:64px;width:auto;display:block}.hero{display:block;height:150px;width:auto;margin:4px auto 14px}
 main{max-width:560px;margin:0 auto;padding:0 18px 40px}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
 button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:11px;min-height:44px;padding:11px 17px;cursor:pointer}
@@ -24,7 +24,7 @@ h1{font-size:26px;line-height:1.25;margin:6px 0 10px}h2{font-size:19px;margin:0 
 ul{padding-left:20px}li{margin:6px 0}.stack{display:grid;gap:14px}
 </style></head><body>
 <div class="notice" id="notice"></div>
-<header><div class="logo"><span>êm</span><small>WELLNESS</small></div><div class="lang"><button id="vi">VI</button> <button id="en">EN</button></div></header>
+<header><img class="logo" src="logo.png" alt="Êm Wellness" width="38" height="64"><div class="lang"><button id="vi">VI</button> <button id="en">EN</button></div></header>
 <main id="app"></main>
 <script>
 const CONFIG={brand:"Êm Wellness",storageKey:"em-wellness-quiz-v1",defaultLang:"vi"};
@@ -61,7 +61,7 @@ function setLang(l){lang=l;localStorage.setItem(CONFIG.storageKey+"-lang",l);doc
 $("vi").onclick=()=>setLang("vi");$("en").onclick=()=>setLang("en");
 function compute(a){const s={};QS.forEach((q,k)=>{const v=q[1]?4-a[k]:a[k];(s[q[0]]=s[q[0]]||[]).push(v)});const c={};for(const k in s)c[k]=Math.round(s[k].reduce((x,y)=>x+y,0)/(s[k].length*4)*100);const o=Math.round(Object.values(c).reduce((x,y)=>x+y,0)/Object.keys(c).length);return{c,o}}
 function render(){const t=T[lang];$("notice").textContent=t.notice;$("vi").className=lang=="vi"?"on":"";$("en").className=lang=="en"?"on":"";
-if(i<0){const last=load();app.innerHTML=`<div class="card"><h1>${t.title}</h1><p class="muted">${t.intro}</p><div class="nav"><button class="primary" id="go">${t.start}</button>${last?`<button id="last">${t.resume}</button>`:""}</div><div class="disc">${t.disc}</div></div>`;
+if(i<0){const last=load();app.innerHTML=`<div class="card"><img class="hero" src="logo.png" alt=""><h1>${t.title}</h1><p class="muted">${t.intro}</p><div class="nav"><button class="primary" id="go">${t.start}</button>${last?`<button id="last">${t.resume}</button>`:""}</div><div class="disc">${t.disc}</div></div>`;
 $("go").onclick=()=>{i=0;ans=[];render()};if(last)$("last").onclick=()=>{ans=last.ans;i=QS.length;render()};return}
 if(i<QS.length){const q=QS[i];app.innerHTML=`<div class="muted">${t.q} ${i+1}${t.of}${QS.length}</div><div class="bar" role="progressbar" aria-valuenow="${i}" aria-valuemax="${QS.length}"><i style="width:${i/QS.length*100}%"></i></div><div class="card"><div class="cat">${CATS[q[0]][lang]}</div><h2>${lang=="vi"?q[2]:q[3]}</h2><div class="opts">${t.opts.map((o,k)=>`<button data-k="${k}" class="${ans[i]===k?"sel":""}">${o}</button>`).join("")}</div><div class="nav"><button id="bk" ${i==0?"disabled":""}>${t.back}</button><button class="primary" id="nx" ${ans[i]==null?"disabled":""}>${i==QS.length-1?t.finish:t.next}</button></div></div>`;
 app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{ans[i]=+b.dataset.k;setTimeout(()=>{i++;if(i==QS.length)save();render()},180);render()});
