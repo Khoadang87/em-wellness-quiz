@@ -1,13 +1,13 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Êm Wellness — Self-check</title>
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#264c3d"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" type="image/png" href="favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Êm Wellness"><meta name="description" content="Êm Wellness self-check quiz">
-<link rel="stylesheet" href="app.css?v=14">
+<link rel="stylesheet" href="app.css?v=15">
 </head><body>
 <div id="errbar" role="alert"></div><script>
-(function(){function show(m){var b=document.getElementById("errbar");if(!b)return;b.style.display="block";b.textContent="Lỗi / Error: "+m+" (v14)"}
+(function(){function show(m){var b=document.getElementById("errbar");if(!b)return;b.style.display="block";b.textContent="Lỗi / Error: "+m+" (v15)"}
 window.onerror=function(m,s,l,c){show(m+" @"+(l||0)+":"+(c||0))};window.addEventListener("unhandledrejection",function(e){show(String(e.reason))});
 })();</script><div class="notice" id="notice"></div>
 <header><img class="logo" src="logo.png" alt="Êm Wellness" width="38" height="64"><div class="lang"><button id="bell" class="bell"></button><button id="acct" class="acct" aria-haspopup="menu"></button><div id="amenu" class="amenu" role="menu" hidden></div> <button id="vi">VI</button> <button id="en">EN</button></div></header>
 <main id="app"></main>
-<script src="quiz.js?v=14"></script><script src="booking.js?v=14"></script><script src="auth.js?v=14"></script><script src="features.js?v=14"></script><script src="extras.js?v=14"></script><script src="main.js?v=14"></script>
+<script src="quiz.js?v=15"></script><script src="booking.js?v=15"></script><script src="auth.js?v=15"></script><script src="features.js?v=15"></script><script src="extras.js?v=15"></script><script src="extras2.js?v=15"></script><script src="main.js?v=15"></script>
 <script>if("serviceWorker" in navigator){let r=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!r){r=true;location.reload()}});addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(g=>g.update()).catch(()=>{}))}</script></body></html>
